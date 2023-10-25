@@ -14,6 +14,8 @@ class User
 
   # スコアの表示の共通化
 
+  #
+
   def burst?
     return unless @own_point > 21
 
