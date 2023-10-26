@@ -7,17 +7,6 @@ class Game
     puts 'ブラックジャックを開始します。'
   end
 
-  # バースト判定
-  def burst?(score)
-    return unless score > 21
-
-    true
-  end
-
-  def burst_message
-    puts 'バーストしました'
-  end
-
   # 勝敗判定
   def win_or_lose(player_score, dealer_score)
     if player_score > dealer_score && player_score <= 21 && dealer_score <= 21

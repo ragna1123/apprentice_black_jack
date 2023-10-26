@@ -4,9 +4,11 @@ require 'debug'
 require './game'
 require './card'
 require './user'
+require './rule'
 
 game = Game.new
 card = Card.new
+rule = Rule.new
 player = Player.new
 dealer = Dealer.new
 
@@ -26,9 +28,9 @@ next_hand = player.player_next_hand? # 追加するかの入力
 while next_hand == true # 入力にNが来るまで回り続ける
   card_info = card.card_draw
   player.draw(card_info)
-  if game.burst?(player.return_score) # ポイントが21を超えたらバーストして終了
+  if rule.burst?(player.return_score) # ポイントが21を超えたらバーストして終了
     player.total_score
-    game.burst_message
+    rule.burst_message
     game.win_or_lose(player.return_score, dealer.return_score)
   end
   next_hand = player.player_next_hand?
@@ -43,7 +45,7 @@ while next_hand == true
   card_info = card.card_draw
   dealer.draw(card_info)
   if game.burst?(dealer.return_score)
-    game.burst_message
+    rule.burst_message
   end
   next_hand = dealer.cpu_next_hand?
 end
