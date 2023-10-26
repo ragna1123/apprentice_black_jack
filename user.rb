@@ -2,14 +2,13 @@
 
 # ユーザーに関するクラス
 class User
-  attr_accessor :own_point
 
   def initialize
     @own_point = 0
     @user_name = { 'Player' => 'あなた', 'Dealer' => 'ディーラー' }[self.class.name]
   end
 
-  # 引いたカードを足していく
+  # カードのポイントを足していく
   def sum_score(card_point)
     @own_point += card_point
   end
@@ -28,7 +27,7 @@ class User
     end
   end
 
-  # クラスによるメッセージの変更
+  # クラスを見て文章内容を変更
   def draw(card_info)
     puts "#{@user_name}の引いたカードは#{card_info[:suit]}の#{card_info[:num]}です。"
     sum_score(card_info[:point])
@@ -42,7 +41,7 @@ end
 
 # プレイヤーに関するクラス
 class Player < User
-  # ユーザー関係のメッセージ
+  # 次の手を引くかの処理
   def player_next_hand?
     puts "あなたの現在の得点は#{@own_point}です。カードを引きますか？（Y/N）"
     next_hand = gets.chomp

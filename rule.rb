@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Rule
   # バースト判定
   def burst?(score)
@@ -10,12 +12,10 @@ class Rule
     puts 'バーストしました'
   end
 
-  #Aの点数
+  # Aの点数
   def A_convert(card_point, own_point)
-    if card_point == 1 && own_point <= 10
-      return 11
-    else
-      return card_point
-    end
+    return 11 if card_point == 1 && own_point <= 10
+
+    card_point
   end
 end

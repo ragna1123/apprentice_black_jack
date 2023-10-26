@@ -14,9 +14,9 @@ dealer = Dealer.new
 
 i = 0
 while i < 2 # 初回プレイヤーは二回引く
-  card_info = card.card_draw
-  card_info[:point] = rule.A_convert(card_info[:point], player.get_score)
-  player.draw(card_info)
+  card_info = card.card_draw # カードを山から引く
+  card_info[:point] = rule.A_convert(card_info[:point], player.get_score) # ポイントを見て持ち点10以下ならAを11点に変化
+  player.draw(card_info) # playerにカード情報が渡される
   i += 1
 end
 
@@ -26,7 +26,7 @@ card_info[:point] = rule.A_convert(card_info[:point], dealer.get_score)
 dealer.dealer_first_draw(card_info)
 
 # プレイヤーのターン
-next_hand = player.player_next_hand? # 追加するかの入力
+next_hand = player.player_next_hand? # 続けるかの分岐処理
 while next_hand == true # 入力にNが来るまで回り続ける
   card_info = card.card_draw
   card_info[:point] = rule.A_convert(card_info[:point], player.get_score)
@@ -43,8 +43,8 @@ end
 card_info = card.card_draw
 card_info[:point] = rule.A_convert(card_info[:point], dealer.get_score)
 dealer.dealer_second_draw(card_info)
-next_hand = dealer.cpu_next_hand? # デーラー判定式 以上でtrueを返す
-
+# 17以上でtrueを返してループを抜ける
+next_hand = dealer.cpu_next_hand?
 while next_hand == true
   card_info = card.card_draw
   card_info[:point] = rule.A_convert(card_info[:point], dealer.get_score)
