@@ -4,31 +4,42 @@
 class User
   def initialize
     @own_point = 0
+    @user_name = { 'Player' => 'あなた', 'Dealer' => 'ディーラー' }[self.class.name]
   end
 
-  def sum_score(card_point) # 引いたカードを足していく
+  # 引いたカードを足していく
+  def sum_score(card_point)
     @own_point += card_point
   end
 
-  # クラスによる名前の変更　メッセージの共通化
+  # スコアを渡す
+  def return_score
+    @own_point
+  end
+
+  # CPUの挙動
+  def cpu_next_hand?
+    if @own_point >= 17
+      false
+    elsif @own_point <= 16
+      true
+    end
+  end
+
+  # クラスによるメッセージの変更
+  def draw(card_info)
+    puts "#{@user_name}の引いたカードは#{card_info[:suit]}の#{card_info[:num]}です。"
+    sum_score(card_info[:point])
+  end
 
   # スコアの表示の共通化
-
-  def burst?
-    return unless @own_point > 21
-
-    puts 'バーストしました'
-    true
+  def total_score_message
+    puts "#{@user_name}の得点は#{@own_point}です。"
   end
 end
 
 # プレイヤーに関するクラス
 class Player < User
-  def player_draw(card_info)
-    puts "あなたの引いたカードは#{card_info[:suit]}の#{card_info[:num]}です。"
-    sum_score(card_info[:point])
-  end
-
   # ユーザー関係のメッセージ
   def player_next_hand?
     puts "あなたの現在の得点は#{@own_point}です。カードを引きますか？（Y/N）"
@@ -40,11 +51,6 @@ class Player < User
     else
       player_next_hand?
     end
-  end
-
-  def player_score
-    puts "あなたの得点は#{@own_point}です。"
-    @own_point
   end
 end
 
@@ -60,23 +66,5 @@ class Dealer < User
     puts "ディーラーの引いた２枚目のカードは#{card_info[:suit]}の#{card_info[:num]}でした。"
     sum_score(card_info[:point])
     puts "ディーラーの現在の得点は#{@own_point}です。"
-  end
-
-  def dealer_thred_draw(card_info)
-    puts "ディーラーの引いたカードは#{card_info[:suit]}の#{card_info[:num]}です。"
-    sum_score(card_info[:point])
-  end
-
-  def dealer_next_hand?
-    if @own_point >= 17
-      false
-    elsif @own_point <= 16
-      true
-    end
-  end
-
-  def dealer_score
-    puts "ディーラーの得点は#{@own_point}です。"
-    @own_point
   end
 end
