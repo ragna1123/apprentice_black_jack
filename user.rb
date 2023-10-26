@@ -2,6 +2,8 @@
 
 # ユーザーに関するクラス
 class User
+  attr_accessor :own_point
+
   def initialize
     @own_point = 0
     @user_name = { 'Player' => 'あなた', 'Dealer' => 'ディーラー' }[self.class.name]
@@ -13,7 +15,7 @@ class User
   end
 
   # スコアを渡す
-  def return_score
+  def get_score
     @own_point
   end
 

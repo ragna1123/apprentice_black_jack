@@ -39,7 +39,6 @@ class Card
     random_num = @cards_hash[random_suit].keys.sample # 数字を配列からランダムに選択
     card_point = @cards_hash[random_suit][random_num] # カードの点数を呼び出し
     card_delete(random_suit, random_num) # 出したカードをカード配列から削除
-    # puts @cards_hash
     { suit: random_suit, num: random_num, point: card_point } # 配られたカード情報を返す
   end
 
