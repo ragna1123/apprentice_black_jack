@@ -5,7 +5,8 @@ require 'debug'
 # カードに関するクラス
 class Card
   # カード情報
-  @@point_hash = {
+  def initialize
+  @point_hash = {
     'A' => 1,
     '2' => 2,
     '3' => 3,
@@ -20,17 +21,15 @@ class Card
     'Q' => 10,
     'K' => 10
   }
-  @@suit_list = %w[spade heart diamond club]
-  
-  def initialize
-    @cards_hash = {} # カードの山用の空のハッシュを生成
-    card_generate
+  @suit_list = %w[spade heart diamond club]
+  @cards_hash = {} # カードの山用の空のハッシュを生成
+  card_generate
   end
 
   # カードの山を生成
   def card_generate
-    @@suit_list.each do |suit|
-      @cards_hash[suit] = @@point_hash.dup
+    @suit_list.each do |suit|
+      @cards_hash[suit] = @point_hash.dup
     end
   end
 
