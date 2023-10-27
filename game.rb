@@ -61,6 +61,7 @@ class Game
     while @dealer.cpu_next_hand? # 17以上でtrueを返してループを抜ける
       dealer_card_drow
       @dealer.draw(dealer_card_drow)
+      @dealer.total_score_message
       if @rule.burst?(@dealer.get_score)
         @rule.burst_message
       end
