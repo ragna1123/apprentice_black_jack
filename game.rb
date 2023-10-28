@@ -1,9 +1,11 @@
 # frozen_string_literal: true
+require 'debug'
 
 require './game'
 require './card'
 require './user'
 require './rule'
+require './game_config'
 
 # ゲーム関連のクラス
 class Game
@@ -11,83 +13,98 @@ class Game
   def initialize
     @card = Card.new
     @rule = Rule.new
-    @player = Player.new
-    @dealer = Dealer.new
+    @player = Player.new('あなた')
+    @dealer = Dealer.new('ディーラー')
+    game_start
   end
 
   # ゲームスタート
   def game_start
     puts 'ブラックジャックを開始します'
+    config
+  end
+
+  def config
+    @config = Config.new
+    @config.cpu_array << @dealer
     play
   end
 
   # ゲーム進行
   def play
-    2.times do
-      player_add_card
-    end
-    dealer_add_card
+    initial_deal # 初動２枚引く
     player_turn
-    dealer_turn
-    @player.total_score_message
-    @dealer.total_score_message
-    win_or_lose(@player.get_score, @dealer.get_score)
+    cpu_turn_all
+    display_scores
+    decide_the_winner
   end
 
-  # private
-  # # プレーヤーターン
+  # 以下ゲーム進行上にあるループ処理をメソッド化
+  # 初動引き
+  def initial_deal
+    2.times { player_add_card }
+    @config.cpu_array.each { |cpu| cpu_add_card(cpu) }
+  end
+
+  # ディーラーとコンフィグで設定したCPUのターン
+  def cpu_turn_all
+    @config.cpu_array.each { |cpu| cpu_turn(cpu) }
+  end
+
+  # 点数表示
+  def display_scores
+    @player.total_score_message
+    @config.cpu_array.each(&:total_score_message)
+  end
+
+  # 具体的な処理を呼び出し
+  # プレーヤーターン
   def player_add_card
-    @player.draw(player_card_drow) # playerにカード情報が渡される
+    @player.draw(card_drow(@player)) # playerにカード情報が渡される
   end
 
   def player_turn
     while @player.player_next_hand? # 入力にNが来るまで回り続ける
-      @player.draw(player_card_drow)
-      if @rule.burst?(@player.get_score) # ポイントが21を超えたらバーストして終了
-        @player.total_score_message
-        @rule.burst_message
-        win_or_lose(@player.get_score, @dealer.get_score)
-      end
+      @player.draw(card_drow(@player))
+      next unless @rule.burst?(@player.user_score) # ポイントが21を超えたらバーストして終了
+
+      @player.total_score_message
+      @rule.burst_message
+      return
     end
   end
 
-  # ディーラーターン
-  def dealer_add_card
-    @dealer.dealer_first_draw(dealer_card_drow)
+  # CPUターン
+  def cpu_add_card(player)
+    player.cpu_first_draw(card_drow(player))
   end
 
-  def dealer_turn
-    @dealer.dealer_second_draw(dealer_card_drow)
-    while @dealer.cpu_next_hand? # 17以上でtrueを返してループを抜ける
-      dealer_card_drow
-      @dealer.draw(dealer_card_drow)
-      @dealer.total_score_message
-      if @rule.burst?(@dealer.get_score)
-        @rule.burst_message
-      end
+  def cpu_turn(player)
+    player.cpu_second_draw(card_drow(player))
+    while player.cpu_next_hand? # 17以上でtrueを返してループを抜ける
+      player.draw(card_drow(player))
+      player.total_score_message
+      @rule.burst_message if @rule.burst?(player.user_score)
     end
   end
 
-  def player_card_drow
-    card_info = @card.card_draw
-    card_info[:point] = @rule.A_convert(card_info[:point], @player.get_score) # ポイントを見て持ち点10以下ならAを11点に変化
-    card_info
-  end
-
-  def dealer_card_drow
-    card_info = @card.card_draw
-    card_info[:point] = @rule.A_convert(card_info[:point], @dealer.get_score) # ポイントを見て持ち点10以下ならAを11点に変化
+  # ドロー処理
+  def card_drow(player)
+    card_info = @card.card_pull
+    card_info[:point] = @rule.ace_convert(card_info[:point], player.user_score) # ポイントを見て持ち点10以下ならAを11点に変化
     card_info
   end
 
   # 勝敗判定
-  def win_or_lose(player_score, dealer_score)
-    if player_score > dealer_score && player_score <= 21 && dealer_score <= 21
-      puts 'あなたの勝ちです！'
-    elsif dealer_score > 21 && player_score <= 21
-      puts 'あなたの勝ちです'
+  def decide_the_winner
+    players_score = User.private_users_score
+    non_burst_player = players_score.select{ |_, score| (score <= 21) }
+    closest_to_21 = non_burst_player.min_by { |_, score| (21 - score) }
+    if closest_to_21
+      winner_name, winner_score = closest_to_21
+      puts "勝者は#{winner_name}です！"
     else
-      puts 'あなたの負けです'
+      puts '引き分けです'
     end
     game_exit
   end
@@ -99,5 +116,4 @@ class Game
   end
 end
 
-game = Game.new
-game.game_start
+Game.new

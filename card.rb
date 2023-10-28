@@ -34,7 +34,7 @@ class Card
   end
 
   # カードを引く
-  def card_draw
+  def card_pull
     random_suit = @cards_hash.keys.sample # 柄をランダムに選択
     random_num = @cards_hash[random_suit].keys.sample # 数字を配列からランダムに選択
 
