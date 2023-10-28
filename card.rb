@@ -37,9 +37,18 @@ class Card
   def card_draw
     random_suit = @cards_hash.keys.sample # 柄をランダムに選択
     random_num = @cards_hash[random_suit].keys.sample # 数字を配列からランダムに選択
+
+    if random_num == nil # 柄ごとにカードがなくなってnilが帰ってきたらsuit毎に削除、選び直し
+      suit_delete(random_suit)
+      random_suit = @cards_hash.keys.sample
+      random_num = @cards_hash[random_suit].keys.sample
+      p @cards_hash
+    end
+    # ------
+    # ここにカードの山がなくなったら例外処理で強制終了させる処理を追加する
     card_point = @cards_hash[random_suit][random_num] # カードの点数を呼び出し
+    # ------
     card_delete(random_suit, random_num) # 出したカードをカード配列から削除
-    # puts @cards_hash
     { suit: random_suit, num: random_num, point: card_point } # 配られたカード情報を返す
   end
 
@@ -47,4 +56,9 @@ class Card
   def card_delete(suit, num)
     @cards_hash[suit].delete(num)
   end
+
+  def suit_delete(suit)
+    @cards_hash.delete(suit)
+  end
+
 end
