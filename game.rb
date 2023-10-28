@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'debug'
 
 require './game'
@@ -98,13 +99,28 @@ class Game
   # 勝敗判定
   def decide_the_winner
     players_score = User.private_users_score
-    non_burst_player = players_score.select{ |_, score| (score <= 21) }
-    closest_to_21 = non_burst_player.min_by { |_, score| (21 - score) }
-    if closest_to_21
-      winner_name, winner_score = closest_to_21
-      puts "勝者は#{winner_name}です！"
+    not_burst_player = players_score.select { |_, score| (score <= 21) }
+
+    if not_burst_player.empty?
+      p 'バーストしたため、勝者はいません。'
     else
-      puts '引き分けです'
+      # 最も21に近いプレイヤーを探す
+      closest_player = nil
+      closest_score_diff = Float::INFINITY
+
+      not_burst_player.each do |player, score|
+        score_diff = (21 - score).abs
+        if score_diff < closest_score_diff
+          closest_player = player
+          closest_score_diff = score_diff
+        end
+      end
+
+      if closest_player
+        puts "#{closest_player}が勝者です！ (#{players_score[closest_player]}点)"
+      else
+        puts '引き分けです。'
+      end
     end
     game_exit
   end
