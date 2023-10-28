@@ -13,7 +13,7 @@ class Rule
   end
 
   # Aの点数
-  def A_convert(card_point, own_point)
+  def ace_convert(card_point, own_point)
     return 11 if card_point == 1 && own_point <= 10
 
     card_point
